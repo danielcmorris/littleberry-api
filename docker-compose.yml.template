@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  littleberry-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: littleberry-api
+    ports:
+      - "8090:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__server18=Data Source=YOUR_SERVER;Initial Catalog=YOUR_DB;User ID=YOUR_USER;Password=YOUR_PASSWORD;Encrypt=false;TrustServerCertificate=true;
+      - ConnectionStrings__BlobStorage=DefaultEndpointsProtocol=https;AccountName=YOUR_ACCOUNT;AccountKey=YOUR_KEY
+      - Auth0__Authority=https://YOUR_TENANT.auth0.com/
+      - Auth0__Audience=YOUR_AUDIENCE
+      - Auth0__ClientId=YOUR_CLIENT_ID
+      - AppSettings__ApiKeyHeader=X-API-Key
+      - AppSettings__ValidApiKey=YOUR_API_KEY
+      - AppSettings__ImageRootPath=https://YOUR_STORAGE.blob.core.windows.net/bookimages
+      - AppSettings__ImagesContainer=bookimages
+      - AWS__BucketName=YOUR_BUCKET
+      - AWS__AccessKey=YOUR_ACCESS_KEY
+      - AWS__SecretKey=YOUR_SECRET_KEY
+      - AWS__SES__Server=email-smtp.us-west-2.amazonaws.com
+      - AWS__SES__Port=587
+      - AWS__SES__User=YOUR_SES_USER
+      - AWS__SES__Password=YOUR_SES_PASSWORD
+    restart: unless-stopped
