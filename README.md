@@ -169,4 +169,4 @@ LittleberryApi/
 
 ## License
 
-Proprietary - PFSA (Portuguese Fraternal Society of America)
+Proprietary - Morris Development
