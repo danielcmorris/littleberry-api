@@ -33,12 +33,16 @@ public class ImageController : ControllerBase
             if (!allowedExtensions.Contains(extension))
                 return BadRequest("Invalid file type. Allowed types: jpg, jpeg, png, gif, bmp");
 
-            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            var callNumber = Request.Form["callnumber"].ToString().Trim();
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmss");
+            var key = string.IsNullOrEmpty(callNumber)
+                ? $"{timestamp}{extension}"
+                : $"{callNumber}/{timestamp}{extension}";
 
             using var stream = file.OpenReadStream();
-            await _s3Service.UploadFileAsync(stream, uniqueFileName, file.ContentType);
+            await _s3Service.UploadFileAsync(stream, key, file.ContentType);
 
-            return Ok(uniqueFileName);
+            return Ok(key);
         }
         catch (Exception ex)
         {
