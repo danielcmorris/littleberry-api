@@ -36,8 +36,8 @@ public class ImageController : ControllerBase
             var callNumber = Request.Form["callnumber"].ToString().Trim();
             var timestamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmss");
             var key = string.IsNullOrEmpty(callNumber)
-                ? $"{timestamp}{extension}"
-                : $"{callNumber}/{timestamp}{extension}";
+                ? $"library/{timestamp}{extension}"
+                : $"library/{callNumber}/{timestamp}{extension}";
 
             using var stream = file.OpenReadStream();
             await _s3Service.UploadFileAsync(stream, key, file.ContentType);
