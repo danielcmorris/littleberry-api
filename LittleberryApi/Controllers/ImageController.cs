@@ -7,18 +7,15 @@ namespace LittleberryApi.Controllers;
 [Route("api/[controller]")]
 public class ImageController : ControllerBase
 {
-    private readonly IAzureBlobService _blobService;
+    private readonly IAwsS3Service _s3Service;
     private readonly ILogger<ImageController> _logger;
 
-    public ImageController(IAzureBlobService blobService, ILogger<ImageController> logger)
+    public ImageController(IAwsS3Service s3Service, ILogger<ImageController> logger)
     {
-        _blobService = blobService;
+        _s3Service = s3Service;
         _logger = logger;
     }
 
-    /// <summary>
-    /// Upload an image
-    /// </summary>
     [HttpPost]
     public async Task<IActionResult> Post()
     {
@@ -27,29 +24,21 @@ public class ImageController : ControllerBase
             var files = Request.Form.Files;
 
             if (files.Count == 0)
-            {
                 return BadRequest("No files uploaded");
-            }
 
             var file = files[0];
-            var fileName = file.FileName;
-
-            // Get the file extension
-            var extension = Path.GetExtension(fileName).ToLower();
+            var extension = Path.GetExtension(file.FileName).ToLower();
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
 
             if (!allowedExtensions.Contains(extension))
-            {
                 return BadRequest("Invalid file type. Allowed types: jpg, jpeg, png, gif, bmp");
-            }
 
-            // Generate a unique filename
             var uniqueFileName = $"{Guid.NewGuid()}{extension}";
 
             using var stream = file.OpenReadStream();
-            var url = await _blobService.UploadImageAsync(stream, uniqueFileName, file.ContentType);
+            await _s3Service.UploadFileAsync(stream, uniqueFileName, file.ContentType);
 
-            return Ok(new { url, fileName = uniqueFileName });
+            return Ok(uniqueFileName);
         }
         catch (Exception ex)
         {
