@@ -35,14 +35,15 @@ public class ImageController : ControllerBase
 
             var callNumber = Request.Form["callnumber"].ToString().Trim();
             var timestamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmss");
-            var key = string.IsNullOrEmpty(callNumber)
-                ? $"library/{timestamp}{extension}"
-                : $"library/{callNumber}/{timestamp}{extension}";
+            var relativePath = string.IsNullOrEmpty(callNumber)
+                ? $"{timestamp}{extension}"
+                : $"{callNumber}/{timestamp}{extension}";
+            var s3Key = $"library/{relativePath}";
 
             using var stream = file.OpenReadStream();
-            await _s3Service.UploadFileAsync(stream, key, file.ContentType);
+            await _s3Service.UploadFileAsync(stream, s3Key, file.ContentType);
 
-            return Ok(key);
+            return Ok(relativePath);
         }
         catch (Exception ex)
         {
