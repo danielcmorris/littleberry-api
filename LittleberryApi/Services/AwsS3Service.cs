@@ -32,6 +32,7 @@ public class AwsS3Service : IAwsS3Service
                 Key = key,
                 BucketName = _bucketName,
                 ContentType = contentType,
+                CannedACL = S3CannedACL.PublicRead,
             };
 
             using var transferUtility = new TransferUtility(_s3Client);
